@@ -1,0 +1,14 @@
+# 忽略ide
+.idea/
+
+# 忽略venv
+.venv/
+.venv_dev/
+
+# 忽略二进制文件
+DNF魔界人跳一跳半自动工具_by风之凌殇.exe
+
+# 忽略打包过程中的临时文件
+build/
+dist/
+DNF魔界人跳一跳半自动工具_by风之凌殇.exe.spec
