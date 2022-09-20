@@ -1,7 +1,15 @@
+import ctypes
 import math
 import time
 
 from pynput import keyboard, mouse
+
+from draw import draw_line_async, Point
+
+# 确保不受缩放影响，保证Controller获取的坐标是物理屏幕坐标
+# 参考：https://pynput.readthedocs.io/en/latest/mouse.html#ensuring-consistent-coordinates-between-listener-and-controller-on-windows
+PROCESS_PER_MONITOR_DPI_AWARE = 2
+ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
 
 mouseController = mouse.Controller()
 
@@ -14,8 +22,8 @@ base_bounce_force = 100
 print("如何调整当次的弹跳力：z=90 c=110，当吃到对应buff时请点击对应键即可，误触按x直接重置回100即可")
 
 index = 0
-start_position = (0, 0)
-end_position = (0, 0)
+start_position = Point(0, 0)
+end_position = Point(0, 0)
 with keyboard.Events() as events:
     for event in events:
         if type(event) != keyboard.Events.Press:
@@ -25,14 +33,14 @@ with keyboard.Events() as events:
             # 奇数表示开始位置，偶数表示结束位置
             index += 1
 
-            position = mouseController.position
+            x, y = mouseController.position
             if index % 2 == 1:
-                start_position = position
+                start_position = Point(x, y)
                 print(f"\t起点为 {start_position}")
             else:
-                end_position = position
+                end_position = Point(x, y)
 
-                delta_x = end_position[0]-start_position[0]
+                delta_x = end_position.x - start_position.x
                 print(f"\t目标为 {end_position}")
                 print(f"\tx差值为 {delta_x}")
 
@@ -48,8 +56,7 @@ with keyboard.Events() as events:
 
                 print(f"\t预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={addjustment_coefficient})")
 
-                # print(f"\t1秒后开始模拟操作")
-                # time.sleep(1)
+                draw_line_async(start_position, end_position, press_seconds)
 
                 mouseController.press(mouse.Button.left)
                 time.sleep(press_seconds)
