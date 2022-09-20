@@ -5,6 +5,8 @@ import time
 from pynput import keyboard, mouse
 
 from draw import draw_line_async, Point
+from log import logger, color
+from util import show_head_line
 
 
 def ensure_get_actual_position():
@@ -14,18 +16,26 @@ def ensure_get_actual_position():
     ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
 
 
+def show_prompt_message():
+    logger.info("")
+    logger.info(color("bold_yellow") + "请依次将鼠标放到当前位置和目标位置，并分别点击 左ctrl 键（键盘左下角那个）")
+
+
 def main():
     ensure_get_actual_position()
 
     mouseController = mouse.Controller()
 
-    prompt_message = "请依次将鼠标放到当前位置和目标位置，并分别点击 左ctrl 键（键盘左下角那个）"
-
-    print(prompt_message)
-
     bounce_force = 100
     base_bounce_force = 100
-    print("如何调整当次的弹跳力：z=90 c=110，当吃到对应buff时请点击对应键即可，误触按x直接重置回100即可")
+
+    # re: 下面填上实际的文档地址
+    show_head_line("""
+使用说明
+请参考在线文档： *********************************
+    """.strip(), )
+
+    show_prompt_message()
 
     index = 0
     start_position = Point(0, 0)
@@ -42,13 +52,13 @@ def main():
                 x, y = mouseController.position
                 if index % 2 == 1:
                     start_position = Point(x, y)
-                    print(f"\t起点为 {start_position}")
+                    logger.info(f"起点为 {start_position}")
                 else:
                     end_position = Point(x, y)
 
                     delta_x = end_position.x - start_position.x
-                    print(f"\t目标为 {end_position}")
-                    print(f"\tx差值为 {delta_x}")
+                    logger.info(f"目标为 {end_position}")
+                    logger.info(f"X 差值为 {delta_x}")
 
                     # 计算需要按住的时间
                     # 游戏中设定的x速度
@@ -60,7 +70,7 @@ def main():
                     addjustment_coefficient = 1.188
                     press_seconds = addjustment_coefficient * math.fabs(delta_x) / actual_speed
 
-                    print(f"\t预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={addjustment_coefficient})")
+                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={addjustment_coefficient})")
 
                     draw_line_async(start_position, end_position, press_seconds)
 
@@ -70,18 +80,18 @@ def main():
 
                     if bounce_force != base_bounce_force:
                         bounce_force = base_bounce_force
-                        print("\t弹跳力重置为默认值")
+                        logger.info("弹跳力重置为默认值")
 
-                    print(prompt_message)
+                    show_prompt_message()
             elif event.key == keyboard.KeyCode.from_char("z"):
                 bounce_force = 90
-                print(f"本轮弹跳力调整为{bounce_force}")
+                logger.info(color("bold_cyan") + f"本轮弹跳力调整为{bounce_force}")
             elif event.key == keyboard.KeyCode.from_char("c"):
                 bounce_force = 110
-                print(f"本轮弹跳力调整为{bounce_force}")
+                logger.info(color("bold_cyan") + f"本轮弹跳力调整为{bounce_force}")
             elif event.key == keyboard.KeyCode.from_char("x"):
                 bounce_force = 100
-                print(f"本轮弹跳力重置为{bounce_force}")
+                logger.info(color("bold_cyan") + f"本轮弹跳力重置为{bounce_force}")
 
 
 if __name__ == '__main__':
