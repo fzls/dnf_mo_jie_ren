@@ -72,8 +72,10 @@ def main():
 
                     logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={addjustment_coefficient})")
 
+                    # 画条线标记下
                     draw_line_async(start_position, end_position, press_seconds)
 
+                    # 点击对应时长
                     mouseController.press(mouse.Button.left)
                     time.sleep(press_seconds)
                     mouseController.release(mouse.Button.left)
