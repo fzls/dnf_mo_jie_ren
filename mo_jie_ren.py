@@ -32,7 +32,7 @@ class Config(ConfigInterface):
     def __init__(self):
         # 由于实际分辨率问题，按照像素计算出来，可能与实际的有区别，这里用一个系数自行调整，使其能恰好跳到目标点
         # 如果跳的过远，就把这个数值调小点。太近了，则调大，直到找到一个在当前设置下比较合适的数目
-        self.adjustment_coefficient = 1.188
+        self.adjustment_coefficient = 1.05
 
 
 def load_config() -> Config:
