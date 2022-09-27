@@ -1,12 +1,43 @@
 import ctypes
 import math
+import os.path
 import time
 
 from pynput import keyboard, mouse
 
+from data_struct import ConfigInterface
 from draw import draw_line_async, Point
 from log import logger, color
 from util import show_head_line
+
+
+class Config(ConfigInterface):
+    def __init__(self):
+        # 由于实际分辨率问题，按照像素计算出来，可能与实际的有区别，这里用一个系数自行调整，使其能恰好跳到目标点
+        # 如果跳的过远，就把这个数值调小点。太近了，则调大，直到找到一个在当前设置下比较合适的数目
+        self.adjustment_coefficient = 1.188
+
+
+def load_config() -> Config:
+    cfg = Config()
+    cfg.load_from_json_file(config_path())
+    return cfg
+
+
+def save_config(cfg: Config):
+    save_path = config_path()
+    make_sure_dir_exists(os.path.dirname(save_path))
+
+    cfg.save_to_json_file(save_path)
+
+
+def make_sure_dir_exists(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+
+
+def config_path() -> str:
+    return os.path.join(os.path.expandvars("%APPDATA%"), "mo_jie_ren", "config.json")
 
 
 def ensure_get_actual_position():
@@ -22,6 +53,8 @@ def show_prompt_message():
 
 
 def main():
+    cfg = load_config()
+
     ensure_get_actual_position()
 
     mouseController = mouse.Controller()
@@ -65,12 +98,9 @@ def main():
                     speed_x_per_second = 300
                     # 考虑弹跳力的情况
                     actual_speed = speed_x_per_second * bounce_force / base_bounce_force
-                    # 由于实际分辨率问题，按照像素计算出来，可能与实际的有区别，这里用一个系数自行调整，使其能恰好跳到目标点
-                    # 如果跳的过远，就把这个数值调小点。太近了，则调大，直到找到一个在当前设置下比较合适的数目
-                    adjustment_coefficient = 1.188
-                    press_seconds = adjustment_coefficient * math.fabs(delta_x) / actual_speed
+                    press_seconds = cfg.adjustment_coefficient * math.fabs(delta_x) / actual_speed
 
-                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={adjustment_coefficient})")
+                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={cfg.adjustment_coefficient})")
 
                     # 画条线标记下
                     draw_line_async(start_position, end_position, press_seconds)

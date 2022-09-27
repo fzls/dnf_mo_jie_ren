@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os.path
 from abc import ABCMeta
 
 from log import logger
@@ -47,6 +48,10 @@ class ConfigInterface(metaclass=ABCMeta):
         return self
 
     def load_from_json_file(self, filepath: str):
+        if not os.path.isfile(filepath):
+            logger.error(f"未发现配置文件 {filepath}")
+            return
+
         with open(filepath, encoding="utf-8") as f:
             raw_config = json.load(f)
 
