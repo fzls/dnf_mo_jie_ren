@@ -102,7 +102,7 @@ def main():
 
         logger.info(color("bold_yellow") + f"当前步骤为 {current_step}")
 
-    logger.info(f"当前调整系数为 {cfg.adjustment_coefficient}")
+    logger.info(f"当前修正系数为 {cfg.adjustment_coefficient}")
 
     show_step_prompt()
 
@@ -163,7 +163,7 @@ def main():
                 bounce_force = 100
                 logger.info(color("bold_cyan") + f"本轮弹跳力重置为{bounce_force}")
             elif event.key == keyboard.Key.caps_lock:
-                logger.info(color("bold_green") + "进入修正 调整系数 模式，并重置本轮步骤为 选择起始点 阶段，请按照提示输入新的系数~")
+                logger.info(color("bold_green") + "进入调整 修正系数 模式，并重置本轮步骤为 选择起始点 阶段，请按照提示输入新的系数~")
 
                 current_step = STEP_START
                 time.sleep(0.5)
@@ -171,7 +171,7 @@ def main():
                 new_coefficient = 1.0
                 while True:
                     try:
-                        new_coefficient = float(input(f"当前调整系数为 {cfg.adjustment_coefficient}，请输入新的系数（如果跳太远，就填个小点的数，跳太近则填个大点的数）: "))
+                        new_coefficient = float(input(f"当前修正系数为 {cfg.adjustment_coefficient}，请输入新的系数（如果跳太远，就填个小点的数，跳太近则填个大点的数）: "))
                         break
                     except Exception as e:
                         logger.error(color("bold_yellow") + "输入的不是一个数字，请确保输入的是浮点数")
