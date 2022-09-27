@@ -133,7 +133,7 @@ def main():
                     actual_speed = speed_x_per_second * bounce_force / base_bounce_force
                     press_seconds = cfg.adjustment_coefficient * math.fabs(delta_x) / actual_speed
 
-                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={cfg.adjustment_coefficient})")
+                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终修正系数={cfg.adjustment_coefficient})")
 
                     # 画条线标记下
                     draw_line_async(start_position, end_position, press_seconds)
