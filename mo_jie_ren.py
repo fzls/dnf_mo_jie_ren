@@ -11,6 +11,22 @@ from draw import draw_line_async, Point
 from log import logger, color
 from util import show_head_line
 
+STEP_START = "选择起始点"
+STEP_END = "选择终点"
+
+
+# 计算下一步是什么
+def get_next_step(current_step: str) -> str:
+    next_step = STEP_END
+    if current_step == STEP_START:
+        next_step = STEP_END
+    elif current_step == STEP_END:
+        next_step = STEP_START
+    else:
+        raise AssertionError(f"unexpected step {current_step}")
+
+    return next_step
+
 
 class Config(ConfigInterface):
     def __init__(self):
@@ -48,11 +64,6 @@ def ensure_get_actual_position():
     ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
 
 
-def show_prompt_message():
-    logger.info("")
-    logger.info(color("bold_yellow") + "请依次将鼠标放到当前位置和目标位置，并分别点击 左ctrl 键（键盘左下角那个）")
-
-
 def disable_quick_edit_mode():
     # https://docs.microsoft.com/en-us/windows/console/setconsolemode
     ENABLE_EXTENDED_FLAGS = 0x0080
@@ -63,41 +74,50 @@ def disable_quick_edit_mode():
 
 
 def main():
-    disable_quick_edit_mode()
+    # disable_quick_edit_mode()
     cfg = load_config()
 
     ensure_get_actual_position()
 
     mouseController = mouse.Controller()
 
-    bounce_force = 100
-    base_bounce_force = 100
-
-    # re: 下面填上实际的文档地址
     show_head_line("""
 使用说明
 请参考在线文档： *********************************
     """.strip(), )
 
-    show_prompt_message()
-
-    index = 0
+    current_step = STEP_START
+    current_block = 1
     start_position = Point(0, 0)
     end_position = Point(0, 0)
+    actual_position = Point(0, 0)
+
+    bounce_force = 100
+    base_bounce_force = 100
+
+    def show_step_prompt():
+        if current_step == STEP_START:
+            logger.info("")
+            logger.info(color("bold_yellow") + f"当前开始第 {current_block} 个格子，请依次将鼠标放到当前位置和目标位置，并分别点击 左ctrl 键（键盘左下角那个）(停止使用可以点击右上角关闭）")
+
+        logger.info(color("bold_yellow") + f"当前步骤为 {current_step}")
+
+    logger.info(f"当前调整系数为 {cfg.adjustment_coefficient}")
+
+    show_step_prompt()
+
     with keyboard.Events() as events:
         for event in events:
             if type(event) != keyboard.Events.Press:
                 continue
 
             if event.key == keyboard.Key.ctrl_l:
-                # 奇数表示开始位置，偶数表示结束位置
-                index += 1
-
                 x, y = mouseController.position
-                if index % 2 == 1:
+
+                if current_step == STEP_START:
                     start_position = Point(x, y)
                     logger.info(f"起点为 {start_position}")
-                else:
+                elif current_step == STEP_END:
                     end_position = Point(x, y)
 
                     delta_x = end_position.x - start_position.x
@@ -124,8 +144,15 @@ def main():
                     if bounce_force != base_bounce_force:
                         bounce_force = base_bounce_force
                         logger.info("弹跳力重置为默认值")
+                else:
+                    raise AssertionError()
 
-                    show_prompt_message()
+                # 更新步骤和区块
+                current_step = get_next_step(current_step)
+                if current_step == STEP_START:
+                    current_block += 1
+
+                show_step_prompt()
             elif event.key == keyboard.KeyCode.from_char("z"):
                 bounce_force = 90
                 logger.info(color("bold_cyan") + f"本轮弹跳力调整为{bounce_force}")
