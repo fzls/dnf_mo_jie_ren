@@ -67,10 +67,10 @@ def main():
                     actual_speed = speed_x_per_second * bounce_force / base_bounce_force
                     # 由于实际分辨率问题，按照像素计算出来，可能与实际的有区别，这里用一个系数自行调整，使其能恰好跳到目标点
                     # 如果跳的过远，就把这个数值调小点。太近了，则调大，直到找到一个在当前设置下比较合适的数目
-                    addjustment_coefficient = 1.188
-                    press_seconds = addjustment_coefficient * math.fabs(delta_x) / actual_speed
+                    adjustment_coefficient = 1.188
+                    press_seconds = adjustment_coefficient * math.fabs(delta_x) / actual_speed
 
-                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={addjustment_coefficient})")
+                    logger.info(color("bold_green") + f"预计需要按住左键 {press_seconds} 秒 (实际速度={actual_speed} 基础速度={speed_x_per_second} 弹跳力={bounce_force} 最终调整系数={adjustment_coefficient})")
 
                     # 画条线标记下
                     draw_line_async(start_position, end_position, press_seconds)
