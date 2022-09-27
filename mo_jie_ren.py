@@ -83,7 +83,9 @@ def main():
 
     show_head_line("""
 使用说明
-请参考在线文档： *********************************
+请参考在线文档： https://docs.qq.com/doc/DYm5KWWRQSlZYcXJx
+
+使用前务必确保已看过上述文档
     """.strip(), )
 
     current_step = STEP_START
