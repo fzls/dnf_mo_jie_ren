@@ -162,6 +162,27 @@ def main():
             elif event.key == keyboard.KeyCode.from_char("x"):
                 bounce_force = 100
                 logger.info(color("bold_cyan") + f"本轮弹跳力重置为{bounce_force}")
+            elif event.key == keyboard.Key.caps_lock:
+                logger.info(color("bold_green") + "进入修正 调整系数 模式，并重置本轮步骤为 选择起始点 阶段，请按照提示输入新的系数~")
+
+                current_step = STEP_START
+                time.sleep(0.5)
+
+                new_coefficient = 1.0
+                while True:
+                    try:
+                        new_coefficient = float(input(f"当前调整系数为 {cfg.adjustment_coefficient}，请输入新的系数（如果跳太远，就填个小点的数，跳太近则填个大点的数）: "))
+                        break
+                    except Exception as e:
+                        logger.error(color("bold_yellow") + "输入的不是一个数字，请确保输入的是浮点数")
+
+
+                old = cfg.adjustment_coefficient
+                cfg.adjustment_coefficient = float(new_coefficient)
+                logger.info(color("bold_yellow") + f"系数变更为 {cfg.adjustment_coefficient}，之前为 {old}，将保存到用户目录的配置")
+                save_config(cfg)
+
+                show_step_prompt()
 
 
 if __name__ == '__main__':
