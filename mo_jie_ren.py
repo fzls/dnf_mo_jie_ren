@@ -3,6 +3,7 @@ import math
 import os.path
 import time
 
+import win32api
 from pynput import keyboard, mouse
 
 from data_struct import ConfigInterface
@@ -52,7 +53,17 @@ def show_prompt_message():
     logger.info(color("bold_yellow") + "请依次将鼠标放到当前位置和目标位置，并分别点击 左ctrl 键（键盘左下角那个）")
 
 
+def disable_quick_edit_mode():
+    # https://docs.microsoft.com/en-us/windows/console/setconsolemode
+    ENABLE_EXTENDED_FLAGS = 0x0080
+
+    logger.info(color("bold_green") + "将禁用命令行的快速编辑模式，避免鼠标误触时程序暂停")
+    kernel32 = ctypes.windll.kernel32
+    kernel32.SetConsoleMode(kernel32.GetStdHandle(win32api.STD_INPUT_HANDLE), ENABLE_EXTENDED_FLAGS)
+
+
 def main():
+    disable_quick_edit_mode()
     cfg = load_config()
 
     ensure_get_actual_position()
