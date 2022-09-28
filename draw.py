@@ -14,8 +14,13 @@ def draw_line(start_point: Point, end_point: Point, duration_seconds: float):
 
     # set line and fill style
     dc.SetBrush(wx.TRANSPARENT_BRUSH)
-    color = wx.Colour(0, 0, 255)
-    dc.SetPen(wx.Pen(color, width=3, style=wx.PENSTYLE_SOLID))
+    color = wx.Colour(255, 20, 147)
+    pen = wx.Pen(
+        color,
+        width=15,
+        style=wx.PENSTYLE_SOLID,
+    )
+    dc.SetPen(pen)
 
     start_time = time.time()
     while True:
