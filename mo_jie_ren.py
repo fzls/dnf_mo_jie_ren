@@ -82,6 +82,8 @@ def main():
     mouseController = mouse.Controller()
 
     show_head_line("""
+Powered by 风之凌殇
+
 使用说明
 请参考在线文档： https://docs.qq.com/doc/DYm5KWWRQSlZYcXJx
 
